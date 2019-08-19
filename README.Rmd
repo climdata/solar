@@ -1,0 +1,56 @@
+---
+title: "Solar Activity"
+author: "Kmicha71"
+date: "19 8 2019"
+output:
+  html_document: 
+    keep_md: true
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Solar Spots
+
+Download the data from http://sidc.oma.be
+
+
+```{sh downloads}
+
+ [ -f ./download/snmtotcsv.csv ] && mv -f ./download/snmtotcsv.csv ./download/snmtotcsv.csv.bck
+ wget -q -P download http://sidc.oma.be/silso/INFO/snmtotcsv.php
+ sed -i '1s/^/year;month;time;sunspots;sd;no;final\n/' ./download/snmtotcsv.php
+ mv ./download/snmtotcsv.php ./download/snmtotcsv.csv
+```
+
+
+
+
+```{r convert}
+solar <- read.csv("./download/snmtotcsv.csv", sep=";")
+solar <- solar[order(solar$time),]
+
+write.table(solar, file = "csv/monthly_sunspots.csv", append = FALSE, quote = TRUE, sep = ",",
+            eol = "\n", na = "NA", dec = ".", row.names = FALSE,
+            col.names = TRUE, qmethod = "escape", fileEncoding = "UTF-8")
+```
+
+
+
+
+## Plot Sunspots
+
+```{r plot, echo=TRUE}
+require("ggplot2")
+solar <- read.csv("./csv/monthly_sunspots.csv", sep=",")
+mp <- ggplot() +
+      geom_line(aes(y=solar$sunspots, x=solar$time), color="blue") +
+      xlab("Year") + ylab("Sunspots [#]")
+mp
+```
+
+
+
+
