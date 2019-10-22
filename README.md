@@ -30,7 +30,9 @@ Download the data from http://sidc.oma.be
 
 ```r
 solar <- read.csv("./download/snmtotcsv.csv", sep=";")
-solar <- solar[order(solar$time),]
+solar$ts <- signif(solar$year + (solar$month-0.5)/12, digits=6)
+solar$time <- paste(solar$year,solar$month, '15 00:00:00', sep='-')
+solar <- solar[order(solar$ts),]
 
 write.table(solar, file = "csv/monthly_sunspots.csv", append = FALSE, quote = TRUE, sep = ",",
             eol = "\n", na = "NA", dec = ".", row.names = FALSE,
@@ -51,10 +53,14 @@ require("ggplot2")
 ## Loading required package: ggplot2
 ```
 
+```
+## Warning: package 'ggplot2' was built under R version 3.5.3
+```
+
 ```r
 solar <- read.csv("./csv/monthly_sunspots.csv", sep=",")
 mp <- ggplot() +
-      geom_line(aes(y=solar$sunspots, x=solar$time), color="blue") +
+      geom_line(aes(y=solar$sunspots, x=solar$ts), color="blue") +
       xlab("Year") + ylab("Sunspots [#]")
 mp
 ```
@@ -79,8 +85,9 @@ names(solar)[names(solar) == "YEAR"] <- "year"
 names(solar)[names(solar) == "MON"] <- "month"
 names(solar)[names(solar) == "SSN"] <- "sunspots"
 names(solar)[names(solar) == "DEV"] <- "sd"
-solar$time <- signif(solar$year + (solar$month-0.5)/12, digits=6)
-solar <- solar[order(solar$time),]
+solar$ts <- signif(solar$year + (solar$month-0.5)/12, digits=6)
+solar$time <- paste(solar$year,solar$month, '15 00:00:00', sep='-')
+solar <- solar[order(solar$ts),]
 
 write.table(solar, file = "csv/monthly_sunspots2.csv", append = FALSE, quote = TRUE, sep = ",",
             eol = "\n", na = "NA", dec = ".", row.names = FALSE,
@@ -92,7 +99,7 @@ write.table(solar, file = "csv/monthly_sunspots2.csv", append = FALSE, quote = T
 require("ggplot2")
 solar <- read.csv("./csv/monthly_sunspots2.csv", sep=",")
 mp <- ggplot() +
-      geom_line(aes(y=solar$sunspots, x=solar$time), color="blue") +
+      geom_line(aes(y=solar$sunspots, x=solar$ts), color="blue") +
       xlab("Year") + ylab("Sunspots [#]")
 mp
 ```
